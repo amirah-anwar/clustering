@@ -35,8 +35,9 @@ def main():
 		#print "soft membership:",soft_mem
 		phi, mu, cov = maximization(soft_mem,np.array(result_matrix))
 		c_factor = convergence(phi, mu, cov, result_matrix)
-		#print "old_factor:",old_factor
-		#print "c_factor:",c_factor
+		print "old_factor:",old_factor
+		print "c_factor:",c_factor
+		print "mean,amp,cov:",mu,phi,cov
 	print "mu:",mu
 
 def convergence(phi, mu, cov, data):
@@ -55,8 +56,8 @@ def expectation(phi, data, cov, mu):
 		for i in range(150):
 			#a = N(data[i],mu[k],cov[k])
 			rik.append(phi[k]*N(data[i], mu[k], cov[k])/r_denom(phi,data[i],mu, cov))
-		print " values:",phi[k],mu[k],cov[k],rik,k
-		dic[k] = rik
+		#print " values:",phi[k],mu[k],cov[k],rik,k
+		dic[k] = rik	
 	return dic
 
 def r_denom(phi,data, mu, cov):
