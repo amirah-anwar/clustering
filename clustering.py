@@ -5,7 +5,7 @@
 
 import random
 import numpy as np
-
+import sys
 #Classifies a data set using K-means Algo,
 #Reads the data file
 #Number of clusters = 3 = k
@@ -21,16 +21,27 @@ def main():
 	    arr = np.array(map(float, values_as_strings))
 	    result_matrix.append(arr)
 
-	# print "read file:", result_matrix
-
 	#Pre-defined number of clusters
 	k = 3
 
 	#K-mean algorithm for classification
+	#First run
 	centroids = kmeans(result_matrix, k)
 
+	#Optimization after scilearn-kit
+	#Run the kmeans algo 9 more times and get the lowest total squared Euclidean Distance
+	minOfRun = squaredeuclidean(centroids)
+	trueCentroid = centroids
+	for i in range(9):
+		currCentroid = kmeans(result_matrix,k)
+		currMin = squaredeuclidean(currCentroid)
+		if(currMin < minOfRun):
+			minOfRun = currMin
+			trueCentroid = currCentroid
+
+
 	print "Calculated centroids"
-	for centroid in centroids:
+	for centroid in trueCentroid:
 		print centroid
 
 #Selects centroids randomly
@@ -80,6 +91,14 @@ def closest(dataPoint, centroids):
 #Calculates Euclidean distance of a centroid and a data point
 def distance(x, y):
 	return np.sqrt(sum((x - y) ** 2))
+
+def squaredeuclidean(arr):
+#Take first set of points and get its square
+	summ = 0.0
+	ab = sum((arr[0] - arr[1])**2)
+	summ += sum((ab - arr[2])**2)
+	return summ
+    #summ += numpy.sum((ab - arr[2])**2)
 
 if __name__ == "__main__":
     main()
