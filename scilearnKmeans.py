@@ -2,6 +2,8 @@ import numpy as np
 from sklearn import cluster
 from matplotlib import pyplot
 
+#Using scilearn-kit to plot and get the values of centroids for our data
+
 f = open("clusters.txt", 'r')
 result_matrix = []
 for line in f.readlines():
@@ -17,6 +19,7 @@ labels = kmeans.labels_
 centroids = kmeans.cluster_centers_
 print centroids
 
+#Plot the data
 for i in range(3):
 	ds = data[np.where(labels==i)]
 	pyplot.plot(ds[:,0],ds[:,1],'o')
