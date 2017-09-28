@@ -32,11 +32,16 @@ def plot_results(X, Y_, means, covariances, index, title):
         ell.set_clip_box(splot.bbox)
         ell.set_alpha(0.5)
         splot.add_artist(ell)
+    for i in range(3):
+		lines = plt.plot(means[i,0],means[i,1],'kx')
+		plt.setp(lines,ms=15.0)
+		plt.setp(lines,mew=2.0)
+		
 
-    plt.xlim(-9., 5.)
-    plt.ylim(-3., 6.)
-    plt.xticks(())
-    plt.yticks(())
+    # plt.xlim(-9., 5.)
+    # plt.ylim(-3., 6.)
+    # plt.xticks(())
+    # plt.yticks(())
     plt.title(title)
 
 f = open("clusters.txt", 'r')
