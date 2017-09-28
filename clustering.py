@@ -39,7 +39,7 @@ def main():
 #Repeats steps 1 and 2 until centroids converge
 def kmeans(dataSet, k):
 	centroids = random.sample(dataSet, k)
-	print "randomly selected centroids:", centroids
+	# print "randomly selected centroids:", centroids
 
 	prevCentroids = None
 	#Runs until centroids converge
@@ -49,7 +49,7 @@ def kmeans(dataSet, k):
 		clusters = assignment(dataSet, centroids)
 		#Re-calculates the centroid for each cluster
 		centroids = reComputation(clusters)
-		print "re-computed centroids:", centroids
+		# print "re-computed centroids:", centroids
 	return centroids
 
 #Re-calculates the centroid for each cluster

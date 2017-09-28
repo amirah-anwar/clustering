@@ -36,7 +36,7 @@ def plot_results(X, Y_, means, covariances, index, title):
 		lines = plt.plot(means[i,0],means[i,1],'kx')
 		plt.setp(lines,ms=15.0)
 		plt.setp(lines,mew=2.0)
-		
+
 
     # plt.xlim(-9., 5.)
     # plt.ylim(-3., 6.)
@@ -52,7 +52,7 @@ for line in f.readlines():
 	result_matrix.append(arr)
 data = np.array(result_matrix)
 
-gmm = mixture.GaussianMixture(n_components=3, covariance_type='full').fit(data)
+gmm = mixture.GaussianMixture(n_components=3, covariance_type='full', init_params="random").fit(data)
 print "mus", gmm.means_
 plot_results(data, gmm.predict(data), gmm.means_, gmm.covariances_, 0,
              'Gaussian Mixture')

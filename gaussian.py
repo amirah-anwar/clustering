@@ -8,6 +8,7 @@ import numpy as np
 from numpy import sum
 import math
 from numpy.linalg import inv
+import clustering
 
 def main():
 	#load txt file into an array of numpy arrays
@@ -18,19 +19,40 @@ def main():
 	    arr = np.array(map(float, values_as_strings))
 	    result_matrix.append(arr)
 	result_matrix = np.array(result_matrix)
-	calculated_mu = gmm(result_matrix)
-	print "re_computed mu", calculated_mu
 
-def gmm(result_matrix):
+	k=3
+	centroids = clustering.kmeans(result_matrix, k)
+
+	print "Calculated centroids by K-Means Algorithm"
+	for centroid in centroids:
+		print centroid
+
+	method = "random"
+	calculated_mu_random = gmm(result_matrix, method, k)
+	print "Computed means by GMM with random initialisation"
+	for index in calculated_mu_random:
+		print calculated_mu_random[index]
+
+	method = "k-means"
+	calculated_mu_kmean = gmm(result_matrix, method, k)
+	print "Computed means by GMM with k-means initialisation"
+	for index in calculated_mu_kmean:
+		print calculated_mu_kmean[index]
+
+def gmm(result_matrix, method, k):
 	#Initialize assuming gaussian parameters, get back soft memb
 	#Assume/given parameters, mu, cov, and phi, get sof memberships
 	#Assume/given soft membership, recalculate parameters
-	mu = {}
-	temp = random.sample(result_matrix,3)  #get 1 random points represented in numpy arrs
-	print "random centroids", temp
-	for k in range(3):
-		mu[k] = temp[k]
-	print "random mu", mu
+	if method == "random":
+		mu = {}
+		temp = random.sample(result_matrix,k)  #get 1 random points represented in numpy arrs
+		# print "random centroids", temp
+		for k in range(3):
+			mu[k] = temp[k]
+		# print "random mu", mu
+
+	if method == "k-means":
+		mu = clustering.kmeans(result_matrix, k)
 	D = {0:result_matrix - mu[0], 1:result_matrix - mu[1], 2:result_matrix - mu[2]} #150X2 - vector of 2 elements
 	# print "D", D
 	n = float(len(result_matrix))
@@ -61,8 +83,8 @@ def gmm(result_matrix):
 		n += 1
 		# threshold = threshold - 1
 
-	print "iterations", n
-	print "convergence factor", list_factor
+	# print "iterations", n
+	# cprint "convergence factor", list_factor
 	return mu
 
 def convergence(phi, mu, cov, data):
