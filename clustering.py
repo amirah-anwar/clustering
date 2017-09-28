@@ -5,7 +5,7 @@
 
 import random
 import numpy as np
-
+import sys
 #Classifies a data set using K-means Algo,
 #Reads the data file
 #Number of clusters = 3 = k
@@ -21,16 +21,16 @@ def main():
 	    arr = np.array(map(float, values_as_strings))
 	    result_matrix.append(arr)
 
-	# print "read file:", result_matrix
-
 	#Pre-defined number of clusters
 	k = 3
 
 	#K-mean algorithm for classification
-	centroids = kmeans(result_matrix, k)
+	#First run
+	centroids, clusters = kmeans(result_matrix, k)
+	trueCentroid = trueCentroids(centroids, result_matrix, k)
 
 	print "Calculated centroids"
-	for centroid in centroids:
+	for centroid in trueCentroid:
 		print centroid
 
 #Selects centroids randomly
@@ -50,7 +50,7 @@ def kmeans(dataSet, k):
 		#Re-calculates the centroid for each cluster
 		centroids = reComputation(clusters)
 		# print "re-computed centroids:", centroids
-	return centroids
+	return centroids, clusters
 
 #Re-calculates the centroid for each cluster
 #by calculating the mean of each cluster
@@ -80,6 +80,27 @@ def closest(dataPoint, centroids):
 #Calculates Euclidean distance of a centroid and a data point
 def distance(x, y):
 	return np.sqrt(sum((x - y) ** 2))
+
+def squaredeuclidean(arr):
+#Take first set of points and get its square
+	summ = 0.0
+	ab = sum((arr[0] - arr[1])**2)
+	summ += sum((ab - arr[2])**2)
+	return summ
+    #summ += numpy.sum((ab - arr[2])**2)
+
+def trueCentroids(centroids, result_matrix, k):
+	#Optimization after scilearn-kit
+	#Run the kmeans algo 9 more times and get the lowest total squared Euclidean Distance
+	minOfRun = squaredeuclidean(centroids)
+	trueCentroid = centroids
+	for i in range(9):
+		currCentroid, clusters = kmeans(result_matrix,k)
+		currMin = squaredeuclidean(currCentroid)
+		if(currMin < minOfRun):
+			minOfRun = currMin
+			trueCentroid = currCentroid
+	return trueCentroid
 
 if __name__ == "__main__":
     main()

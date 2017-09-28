@@ -5,6 +5,7 @@ from scipy import linalg
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
+
 from sklearn import mixture
 
 color_iter = itertools.cycle(['navy', 'c', 'cornflowerblue', 'gold',
@@ -54,6 +55,7 @@ data = np.array(result_matrix)
 
 gmm = mixture.GaussianMixture(n_components=3, covariance_type='full', init_params="random").fit(data)
 print "mus", gmm.means_
+print "predict", gmm.predict(data)
 plot_results(data, gmm.predict(data), gmm.means_, gmm.covariances_, 0,
              'Gaussian Mixture')
 plt.show()
