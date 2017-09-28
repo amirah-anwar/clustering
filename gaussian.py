@@ -3,6 +3,7 @@
 # Amirah Anwar
 # Reetinder Kaur
 import itertools
+from pylab import *
 import random
 import numpy as np
 from numpy import sum
@@ -13,6 +14,7 @@ from matplotlib import pyplot
 from cycler import cycler
 from scipy import linalg
 import matplotlib as mpl
+from matplotlib import gridspec
 
 color_iter = itertools.cycle(['navy', 'c', 'cornflowerblue', 'gold',
                               'darkorange'])
@@ -30,11 +32,14 @@ def main():
 
 	method = "k-means"
 	mu_kmean, phi_kmean, cov_kmean, predictions = gmm(result_matrix, method, k)
-	fig = pyplot.figure(1)
+
+	fig = pyplot.figure()
+	gs = gridspec.GridSpec(3, 3)
+	ax1 = fig.add_subplot(gs[0,:])
+
 	print "GMM with k-means initialization"
 	output_print(mu_kmean, cov_kmean, phi_kmean)
-	ax1 = fig.add_subplot(311)
-	plot_results(result_matrix, predictions, mu_kmean, cov_kmean, 0, 'Gaussian Mixture with k-means initialization', ax1)
+	plot_results(result_matrix, predictions, mu_kmean, cov_kmean, 0, 'Gaussian Mixture with k-means initialization', ax1, fig, gs)
 
 	print "----------------------------------------------------"
 
@@ -43,8 +48,9 @@ def main():
 
 	print "GMM with random initialization"
 	output_print(mu_random, cov_random, phi_random)
-	ax2 = fig.add_subplot(312)
-	plot_results(result_matrix, predictions, mu_random, cov_random, 0, 'Gaussian Mixture with random initialization', ax2)
+
+	ax2 = fig.add_subplot(gs[1,:])
+	plot_results(result_matrix, predictions, mu_random, cov_random, 1, 'Gaussian Mixture with random initialization', ax2, fig, gs)
 
 	print "----------------------------------------------------"	
 
@@ -54,7 +60,7 @@ def main():
 	print "Calculated centroids by K-Means Algorithm"
 	for centroid in trueCentroid:
 		print centroid
-	plot_kmeans(clusters, trueCentroid, fig)
+	plot_kmeans(clusters, trueCentroid, fig, gs)
 
 	pyplot.show()
 
@@ -69,58 +75,67 @@ def output_print(means, covariances, phis):
 	for index in covariances:
 		print covariances[index]
 
-def plot_kmeans(clusters, trueCentroid, fig):
-	ax1 = fig.add_subplot(313)
+def plot_kmeans(clusters, trueCentroid, fig, gs):
+	ax3 = fig.add_subplot(gs[2,:])
 	i = 0
 	for key, value in clusters.iteritems():
 		value =  np.array(value)
-		ax1.scatter(value[:,0],value[:,1], marker='o')
-		lines = ax1.plot(trueCentroid[i][0],trueCentroid[i][1],'kx')
+		ax3.scatter(value[:,0],value[:,1], marker='o')
+		lines = ax3.plot(trueCentroid[i][0],trueCentroid[i][1],'kx')
 		pyplot.setp(lines,ms=15.0)
 		pyplot.setp(lines,mew=2.0)
 		pyplot.title("K-Means")
 		i += 1
 
-def plot_results(X, Y_, means_dic, covariances_dic, index, title, ax):
-	splot = pyplot.subplot(2, 1, 1 + index)
+def plot_results(X, Y_, means_dic, covariances_dic, index, title, ax, fig, gs):
+	splot = fig.add_subplot(gs[index,:])
 	means = []
 	covariances = []
 	for i in range(len(means_dic)):
 		means.append(means_dic[i])
-
+	print "means", means
 	for i in range(len(covariances_dic)):
 		covariances.append(covariances_dic[i])
 
-	for i, (mean, covar, color) in enumerate(zip(means, covariances, color_iter)):
-		v, w = linalg.eigh(covar)
-		v = 2. * np.sqrt(2.) * np.sqrt(v)
-		u = w[0] / linalg.norm(w[0])
+	# major ticks every 1, minor ticks every 100                                     
+	major_ticks = np.arange(0, 101, 1)                                              
+	minor_ticks = np.arange(0, 101, 100)                                               
 
-        # as the DP will not use every component it has access to
-        # unless it needs it, we shouldn't plot the redundant
-        # components.
-		if not np.any(Y_ == i):
-			continue
+	ax.set_xticks(major_ticks)                                                       
+	ax.set_xticks(minor_ticks, minor=True)                                           
+	ax.set_yticks(major_ticks)                                                       
+	ax.set_yticks(minor_ticks, minor=True)                                           
+	ax.set_xlim(-9., 5.)
+	ax.set_ylim(-3., 6.)
+	# and a corresponding grid                                                       
 
-		ax.scatter(X[Y_ == i, 0], X[Y_ == i, 1], .8, color=color)
+	ax.grid(which='both')     
+	ax.scatter(X[:,0], X[:,1], marker='o')
 
-        # Plot an ellipse to show the Gaussian component
-		angle = np.arctan(u[1] / u[0])
-		angle = 180. * angle / np.pi  # convert to degrees
-		ell = mpl.patches.Ellipse(mean, v[0], v[1], 180. + angle, color=color)
-		ell.set_clip_box(splot.bbox)
-		ell.set_alpha(0.5)
-		splot.add_artist(ell)
+	# for i, (mean, covar, color) in enumerate(zip(means, covariances, color_iter)):
+	# 	v, w = linalg.eigh(covar)
+	# 	v = 2. * np.sqrt(2.) * np.sqrt(v)
+	# 	u = w[0] / linalg.norm(w[0])
+	# 	print i
 
-	i = 0
-	print "Y_", Y_
-	for key, value in means_dic.iteritems():
-		print "key", key
-		print "value", value
-    	lines = ax.plot(means_dic[i][0],means_dic[i][1],'kx')
-    	pyplot.setp(lines,ms=15.0)
-    	pyplot.setp(lines,mew=2.0)
-    	i += 1
+ #        # as the DP will not use every component it has access to
+ #        # unless it needs it, we shouldn't plot the redundant
+ #        # components.
+	# 	if not np.any(Y_ == i):
+	# 		continue
+
+	# 	ax.scatter(X[Y_ == i, 0], X[Y_ == i, 1], .8, color=color)
+
+ #        # Plot an ellipse to show the Gaussian component
+	# 	angle = np.arctan(u[1] / u[0])
+	# 	angle = 180. * angle / np.pi  # convert to degrees
+	# 	ell = mpl.patches.Ellipse(mean, v[0], v[1], 180. + angle, color=color)
+	# 	ell.set_clip_box(splot.bbox)
+	# 	ell.set_alpha(0.5)
+	# 	splot.add_artist(ell)
+	means = np.array(means)
+	ax.scatter(means[:,0], means[:,1], marker='x')
+
 	pyplot.title(title)
 
 def gmm(result_matrix, method, k):
@@ -156,7 +171,6 @@ def gmm(result_matrix, method, k):
 		phi, mu, cov = maximization(soft_mem, result_matrix)
 		new_factor = convergence(phi, mu, cov, result_matrix)
 
-	print "soft_mem", soft_mem
 	predictions = predict(soft_mem)
 	return mu, phi, cov, predictions
 
@@ -170,8 +184,6 @@ def predict(soft_mem):
 			if maxi < temp_max:
 				maxi = temp_max
 				key = k
-		print "key", key
-		print key
 		temp.append(key)
 	predictions = np.array(temp)
 	return predictions
