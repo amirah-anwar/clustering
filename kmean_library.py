@@ -26,4 +26,5 @@ for i in range(3):
 	lines = pyplot.plot(centroids[i,0],centroids[i,1],'kx')
 	pyplot.setp(lines,ms=15.0)
 	pyplot.setp(lines,mew=2.0)
+	pyplot.title("K-Means")
 pyplot.show()
