@@ -1,7 +1,7 @@
 # ==============Group Members==================================
-# Michelle Becerra
-# Amirah Anwar
-# Reetinder Kaur
+# Michelle Becerra mdbecerr@usc.edu
+# Amirah Anwar anwara@usc.edu
+# Reetinder Kaur reetindk@usc.edu
 
 import random
 import numpy as np
