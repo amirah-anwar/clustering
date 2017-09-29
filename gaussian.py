@@ -1,9 +1,9 @@
 # ==============Group Members==================================
-# Michelle Becerra
-# Amirah Anwar
-# Reetinder Kaur
+# Michelle Becerra mdbecerr@usc.edu
+# Amirah Anwar anwara@usc.edu
+# Reetinder Kaur reetindk@usc.edu
+
 import itertools
-from pylab import *
 import random
 import numpy as np
 from numpy import sum
@@ -11,13 +11,11 @@ import math
 from numpy.linalg import inv
 import clustering
 from matplotlib import pyplot
-from cycler import cycler
 from scipy import linalg
 import matplotlib as mpl
 from matplotlib import gridspec
 
-color_iter = itertools.cycle(['navy', 'c', 'cornflowerblue', 'gold',
-                              'darkorange'])
+color_iter = itertools.cycle(['navy', 'turquoise', 'red'])
 def main():
 	#load txt file into an array of numpy arrays
 	f = open("clusters.txt", 'r')
@@ -28,21 +26,26 @@ def main():
 	    result_matrix.append(arr)
 	result_matrix = np.array(result_matrix)
 
+	#number of clusters
 	k=3
 
+	#gaussian misture model parameters calculation with kmeans initialization
 	method = "k-means"
 	mu_kmean, phi_kmean, cov_kmean, predictions = gmm(result_matrix, method, k)
 
+	#creating three subplots
 	fig = pyplot.figure()
 	gs = gridspec.GridSpec(3, 3)
-	ax1 = fig.add_subplot(gs[0,:])
 
 	print "GMM with k-means initialization"
 	output_print(mu_kmean, cov_kmean, phi_kmean)
+
+	ax1 = fig.add_subplot(gs[0,:])
 	plot_results(result_matrix, predictions, mu_kmean, cov_kmean, 0, 'Gaussian Mixture with k-means initialization', ax1, fig, gs)
 
 	print "----------------------------------------------------"
 
+	#gaussian misture model parameters calculation with random initialization
 	method = "random"
 	mu_random, phi_random, cov_random, predictions = gmm(result_matrix, method, k)
 
@@ -54,6 +57,7 @@ def main():
 
 	print "----------------------------------------------------"	
 
+	#clustering of datapoints with kmeans algorithm
 	centroids, clusters = clustering.kmeans(result_matrix, k)
 	trueCentroid = clustering.trueCentroids(centroids, result_matrix, k)
 
@@ -80,60 +84,55 @@ def plot_kmeans(clusters, trueCentroid, fig, gs):
 	i = 0
 	for key, value in clusters.iteritems():
 		value =  np.array(value)
+		#plot of all datapoints
 		ax3.scatter(value[:,0],value[:,1], marker='o')
+		#plot of true centroids of clusters
 		lines = ax3.plot(trueCentroid[i][0],trueCentroid[i][1],'kx')
-		pyplot.setp(lines,ms=15.0)
-		pyplot.setp(lines,mew=2.0)
 		pyplot.title("K-Means")
 		i += 1
+	#axis set up
+	pyplot.axis([-5,10,-6,10])
+	ax3.grid(which='both')
+	pyplot.setp(ax3.get_xticklabels(), fontsize=8)
+	pyplot.setp(ax3.get_yticklabels(), fontsize=8)
 
 def plot_results(X, Y_, means_dic, covariances_dic, index, title, ax, fig, gs):
+	#adding subplot for gaussian ellipses
 	splot = fig.add_subplot(gs[index,:])
+
 	means = []
 	covariances = []
 	for i in range(len(means_dic)):
 		means.append(means_dic[i])
-	print "means", means
 	for i in range(len(covariances_dic)):
 		covariances.append(covariances_dic[i])
 
-	# major ticks every 1, minor ticks every 100                                     
-	major_ticks = np.arange(0, 101, 1)                                              
-	minor_ticks = np.arange(0, 101, 100)                                               
+	#axis set up
+	ax.grid(which='both')
+	pyplot.axis([-5,10,-6,10])
+	pyplot.setp(ax.get_xticklabels(), fontsize=8)
+	pyplot.setp(ax.get_yticklabels(), fontsize=8)
 
-	ax.set_xticks(major_ticks)                                                       
-	ax.set_xticks(minor_ticks, minor=True)                                           
-	ax.set_yticks(major_ticks)                                                       
-	ax.set_yticks(minor_ticks, minor=True)                                           
-	ax.set_xlim(-9., 5.)
-	ax.set_ylim(-3., 6.)
-	# and a corresponding grid                                                       
-
-	ax.grid(which='both')     
+	#plot of datapoints
 	ax.scatter(X[:,0], X[:,1], marker='o')
 
-	# for i, (mean, covar, color) in enumerate(zip(means, covariances, color_iter)):
-	# 	v, w = linalg.eigh(covar)
-	# 	v = 2. * np.sqrt(2.) * np.sqrt(v)
-	# 	u = w[0] / linalg.norm(w[0])
-	# 	print i
+	#plotting gaussian ellipses 
+	for i, (mean, covar, color) in enumerate(zip(means, covariances, color_iter)):
+		v, w = linalg.eigh(covar)
+		v = 2. * np.sqrt(2.) * np.sqrt(v)
+		u = w[0] / linalg.norm(w[0])
 
- #        # as the DP will not use every component it has access to
- #        # unless it needs it, we shouldn't plot the redundant
- #        # components.
-	# 	if not np.any(Y_ == i):
-	# 		continue
+        # Plot an ellipse to show the Gaussian component
+		angle = np.arctan(u[1] / u[0])
+		angle = 180. * angle / np.pi  # convert to degrees
+		ell = mpl.patches.Ellipse(mean, v[0], v[1], 180. + angle, color=color)
+		ell.set_clip_box(splot.bbox)
+		ell.set_alpha(0.2)
+		#ellipse plot command
+		splot.add_artist(ell)
 
-	# 	ax.scatter(X[Y_ == i, 0], X[Y_ == i, 1], .8, color=color)
-
- #        # Plot an ellipse to show the Gaussian component
-	# 	angle = np.arctan(u[1] / u[0])
-	# 	angle = 180. * angle / np.pi  # convert to degrees
-	# 	ell = mpl.patches.Ellipse(mean, v[0], v[1], 180. + angle, color=color)
-	# 	ell.set_clip_box(splot.bbox)
-	# 	ell.set_alpha(0.5)
-	# 	splot.add_artist(ell)
 	means = np.array(means)
+	#plotting mus
 	ax.scatter(means[:,0], means[:,1], marker='x')
 
 	pyplot.title(title)
@@ -164,16 +163,23 @@ def gmm(result_matrix, method, k):
 	old_factor = None
 	new_factor = convergence(phi, mu, cov, result_matrix)
 
+	#EM algorithm for calculating gaussian parameters
 	soft_mem =	None
 	while old_factor < new_factor:
 		old_factor = new_factor
+		#Expectation step
 		soft_mem = expectation(phi, result_matrix, cov, mu)
+		#Maximization step
 		phi, mu, cov = maximization(soft_mem, result_matrix)
+		#Convergence factor
 		new_factor = convergence(phi, mu, cov, result_matrix)
 
 	predictions = predict(soft_mem)
 	return mu, phi, cov, predictions
 
+#Cluster prediction for datapoints
+#Choosing the cluster for a datapoint which has the highest probability
+#of having that datapoint
 def predict(soft_mem):
 	predictions = np.array([])
 	temp = []
