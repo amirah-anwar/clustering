@@ -29,7 +29,7 @@ def main():
 	#number of clusters
 	k=3
 
-	#gaussian misture model parameters calculation with kmeans initialization
+	#gaussian mixture model parameters calculation with kmeans initialization
 	method = "k-means"
 	mu_kmean, phi_kmean, cov_kmean, predictions = gmm(result_matrix, method, k)
 
@@ -45,7 +45,7 @@ def main():
 
 	print "----------------------------------------------------"
 
-	#gaussian misture model parameters calculation with random initialization
+	#gaussian mixture model parameters calculation with random initialization
 	method = "random"
 	mu_random, phi_random, cov_random, predictions = gmm(result_matrix, method, k)
 
@@ -143,7 +143,7 @@ def gmm(result_matrix, method, k):
 	#Assume/given soft membership, recalculate parameters
 	mu = {}
 	if method == "random":
-		temp = random.sample(result_matrix,k)  #get 1 random points represented in numpy arrs
+		temp = random.sample(result_matrix,k)  #get 3 random points represented in numpy arrs
 
 	if method == "k-means":
 		centroids, clusters = clustering.kmeans(result_matrix, k)
@@ -160,12 +160,12 @@ def gmm(result_matrix, method, k):
 	phi = {0:(1.0/3.0),1:(1.0/3.0), 2:(1.0/3.0)}
 
 	#For convergence
-	old_factor = None
+	old_factor = 10000
 	new_factor = convergence(phi, mu, cov, result_matrix)
 
 	#EM algorithm for calculating gaussian parameters
 	soft_mem =	None
-	while old_factor < new_factor:
+	while (abs(old_factor) - abs(new_factor)) > 0.01:
 		old_factor = new_factor
 		#Expectation step
 		soft_mem = expectation(phi, result_matrix, cov, mu)
