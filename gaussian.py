@@ -65,7 +65,7 @@ def main():
 	for centroid in trueCentroid:
 		print centroid
 	plot_kmeans(clusters, trueCentroid, fig, gs)
-
+	fig.tight_layout()
 	pyplot.show()
 
 def output_print(means, covariances, phis):
@@ -138,8 +138,7 @@ def plot_results(X, Y_, means_dic, covariances_dic, index, title, ax, fig, gs):
 	pyplot.title(title)
 
 def gmm(result_matrix, method, k):
-	#Initialize assuming gaussian parameters, get back soft memb
-	#Assume/given parameters, mu, cov, and phi, get sof memberships
+	#Assume/given parameters: mu, cov, and phi, get sof memberships
 	#Assume/given soft membership, recalculate parameters
 	mu = {}
 	if method == "random":

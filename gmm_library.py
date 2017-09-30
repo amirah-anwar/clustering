@@ -19,9 +19,7 @@ def plot_results(X, Y_, means, covariances, index, title):
         v, w = linalg.eigh(covar)
         v = 2. * np.sqrt(2.) * np.sqrt(v)
         u = w[0] / linalg.norm(w[0])
-        # as the DP will not use every component it has access to
-        # unless it needs it, we shouldn't plot the redundant
-        # components.
+
         if not np.any(Y_ == i):
             continue
         plt.scatter(X[Y_ == i, 0], X[Y_ == i, 1], .8, color=color)
@@ -54,8 +52,9 @@ for line in f.readlines():
 data = np.array(result_matrix)
 
 gmm = mixture.GaussianMixture(n_components=3, covariance_type='full', init_params="random").fit(data)
-print "mus", gmm.means_
-print "predict", gmm.predict(data)
+print "means: \n", gmm.means_
+print "covariances: \n", gmm.covariances_
+
 plot_results(data, gmm.predict(data), gmm.means_, gmm.covariances_, 0,
              'Gaussian Mixture')
 plt.show()

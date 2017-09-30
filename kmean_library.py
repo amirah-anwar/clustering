@@ -16,7 +16,6 @@ kmeans = cluster.KMeans(n_clusters=3)
 kmeans.fit(data)
 
 labels = kmeans.labels_
-print "labels", labels
 centroids = kmeans.cluster_centers_
 print centroids
 
